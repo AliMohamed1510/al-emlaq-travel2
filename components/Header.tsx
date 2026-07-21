@@ -9,9 +9,13 @@ export default function Header() {
       <div className="bg-primary-900/50 py-2 px-4">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 text-sm">
           <div className="flex items-center gap-4">
-            <a href="tel:+20123456789" className="flex items-center gap-1 hover:text-gold-300 transition-colors">
+            <a href="tel:+201509025388" className="flex items-center gap-1 hover:text-gold-300 transition-colors">
               <Phone size={14} />
-              <span>+20 123 456 789</span>
+              <span>+20 150 902 5388</span>
+            </a>
+            <a href="tel:+201509025388" className="flex items-center gap-1 hover:text-gold-300 transition-colors">
+              <Phone size={14} />
+              <span>+201509025388</span>
             </a>
             <a href="mailto:info@alemlaqtravel.com" className="flex items-center gap-1 hover:text-gold-300 transition-colors">
               <Mail size={14} />
