@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useCallback } from 'react';
-import { useForm, ValidationError } from '@formspree/react';
+import { useState } from 'react';
+import { useForm } from '@formspree/react';
 import { 
   User, 
   Phone, 
@@ -13,7 +13,6 @@ import {
   AlertCircle,
   Globe,
   Briefcase,
-  Camera,
   X,
   Loader2
 } from 'lucide-react';
@@ -89,7 +88,6 @@ export default function ClientForm() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    // Clear error when user types
     if (errors[name as keyof FormData]) {
       setErrors(prev => ({ ...prev, [name]: undefined }));
     }
@@ -107,7 +105,6 @@ export default function ClientForm() {
         return;
       }
       setPassportFile(file);
-
       if (file.type.startsWith('image/')) {
         const reader = new FileReader();
         reader.onloadend = () => {
@@ -127,26 +124,16 @@ export default function ClientForm() {
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     if (!validate()) return;
-
-    // Create FormData for Formspree (supports file uploads!)
     const submitData = new FormData();
-
-    // Add all text fields
     Object.entries(formData).forEach(([key, value]) => {
       submitData.append(key, value);
     });
-
-    // Add file if exists
     if (passportFile) {
       submitData.append('passport', passportFile);
     }
-
-    // Add metadata
     submitData.append('_subject', `تسجيل عميل جديد - ${formData.fullName}`);
     submitData.append('_replyto', formData.email);
-
     await handleSubmit(submitData);
   };
 
@@ -177,7 +164,6 @@ export default function ClientForm() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      {/* Info Banner */}
       <div className="bg-gradient-to-r from-gold-50 to-gold-100 border border-gold-200 rounded-2xl p-4 mb-6 flex items-start gap-3">
         <AlertCircle size={20} className="text-gold-600 mt-0.5 flex-shrink-0" />
         <div className="text-sm text-gold-800">
@@ -187,7 +173,6 @@ export default function ClientForm() {
       </div>
 
       <form onSubmit={onSubmit} className="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
-        {/* Form Header */}
         <div className="bg-gradient-to-l from-primary-600 to-primary-700 px-8 py-6">
           <h2 className="text-xl font-bold text-white flex items-center gap-2">
             <User size={24} />
@@ -197,7 +182,6 @@ export default function ClientForm() {
         </div>
 
         <div className="p-8 space-y-6">
-          {/* Personal Info Section */}
           <div className="space-y-4">
             <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2 pb-2 border-b-2 border-primary-100">
               <User size={20} className="text-primary-600" />
@@ -205,7 +189,6 @@ export default function ClientForm() {
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Full Name */}
               <div className="space-y-1.5">
                 <label className="block text-sm font-semibold text-slate-700">
                   الاسم الكامل <span className="text-red-500">*</span>
@@ -232,7 +215,6 @@ export default function ClientForm() {
                 )}
               </div>
 
-              {/* Phone */}
               <div className="space-y-1.5">
                 <label className="block text-sm font-semibold text-slate-700">
                   رقم الجوال <span className="text-red-500">*</span>
@@ -259,7 +241,6 @@ export default function ClientForm() {
                 )}
               </div>
 
-              {/* Email */}
               <div className="space-y-1.5">
                 <label className="block text-sm font-semibold text-slate-700">
                   البريد الإلكتروني <span className="text-red-500">*</span>
@@ -287,7 +268,6 @@ export default function ClientForm() {
                 )}
               </div>
 
-              {/* Nationality */}
               <div className="space-y-1.5">
                 <label className="block text-sm font-semibold text-slate-700">
                   الجنسية <span className="text-red-500">*</span>
@@ -316,7 +296,6 @@ export default function ClientForm() {
             </div>
           </div>
 
-          {/* Passport Section */}
           <div className="space-y-4">
             <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2 pb-2 border-b-2 border-primary-100">
               <FileText size={20} className="text-primary-600" />
@@ -324,7 +303,6 @@ export default function ClientForm() {
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Passport Number */}
               <div className="space-y-1.5">
                 <label className="block text-sm font-semibold text-slate-700">
                   رقم الجواز <span className="text-red-500">*</span>
@@ -351,7 +329,6 @@ export default function ClientForm() {
                 )}
               </div>
 
-              {/* Passport Upload */}
               <div className="space-y-1.5 md:col-span-2">
                 <label className="block text-sm font-semibold text-slate-700">
                   صورة الجواز <span className="text-slate-400 font-normal">(اختياري - صورة أو PDF)</span>
@@ -408,7 +385,6 @@ export default function ClientForm() {
             </div>
           </div>
 
-          {/* Service & Appointment Section */}
           <div className="space-y-4">
             <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2 pb-2 border-b-2 border-primary-100">
               <Briefcase size={20} className="text-primary-600" />
@@ -416,7 +392,6 @@ export default function ClientForm() {
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Service Type */}
               <div className="space-y-1.5">
                 <label className="block text-sm font-semibold text-slate-700">
                   نوع الخدمة <span className="text-red-500">*</span>
@@ -445,7 +420,6 @@ export default function ClientForm() {
                 )}
               </div>
 
-              {/* Appointment Date */}
               <div className="space-y-1.5">
                 <label className="block text-sm font-semibold text-slate-700">
                   تاريخ الموعد <span className="text-red-500">*</span>
@@ -474,7 +448,6 @@ export default function ClientForm() {
               </div>
             </div>
 
-            {/* Notes */}
             <div className="space-y-1.5">
               <label className="block text-sm font-semibold text-slate-700">
                 ملاحظات إضافية <span className="text-slate-400 font-normal">(اختياري)</span>
@@ -490,7 +463,6 @@ export default function ClientForm() {
             </div>
           </div>
 
-          {/* Submit Button */}
           <div className="pt-4">
             <button
               type="submit"
@@ -510,7 +482,7 @@ export default function ClientForm() {
               )}
             </button>
 
-            {state.errors && state.errors.length > 0 && (
+            {state.errors && Object.keys(state.errors).length > 0 && (
               <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl">
                 <p className="text-red-600 text-sm flex items-center gap-2">
                   <AlertCircle size={16} />
