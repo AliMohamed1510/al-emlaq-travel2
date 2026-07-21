@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useForm } from '@formspree/react';
 import { 
   User, 
   Phone, 
@@ -39,8 +38,10 @@ const serviceTypes = [
   { value: 'other', label: 'أخرى' },
 ];
 
+// ✅ اللينك جاهز من Apps Script
+const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbzbFjfm1VF8tYgRl6Gsc22B-S2F3Y9fx3P8lNznBk2xG5WWO1olsuaTJAX1DSrxqdvp/exec';
+
 export default function ClientForm() {
-  const [state, handleSubmit] = useForm(process.env.NEXT_PUBLIC_FORMSPREE_FORM_ID || '');
   const [formData, setFormData] = useState<FormData>({
     fullName: '',
     phone: '',
@@ -51,14 +52,16 @@ export default function ClientForm() {
     appointmentDate: '',
     notes: '',
   });
-
+  
   const [passportPreview, setPassportPreview] = useState<string | null>(null);
   const [passportFile, setPassportFile] = useState<File | null>(null);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const validate = (): boolean => {
     const newErrors: Partial<Record<keyof FormData, string>> = {};
-
+    
     if (!formData.fullName.trim() || formData.fullName.length < 3) {
       newErrors.fullName = 'الاسم الكامل مطلوب (3 أحرف على الأقل)';
     }
@@ -105,6 +108,7 @@ export default function ClientForm() {
         return;
       }
       setPassportFile(file);
+      
       if (file.type.startsWith('image/')) {
         const reader = new FileReader();
         reader.onloadend = () => {
@@ -122,22 +126,43 @@ export default function ClientForm() {
     setPassportPreview(null);
   };
 
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
     if (!validate()) return;
-    const submitData = new FormData();
-    Object.entries(formData).forEach(([key, value]) => {
-      submitData.append(key, value);
-    });
-    if (passportFile) {
-      submitData.append('passport', passportFile);
+
+    setIsSubmitting(true);
+
+    const data = {
+      fullName: formData.fullName,
+      email: formData.email,
+      phone: formData.phone,
+      nationality: formData.nationality,
+      passportNumber: formData.passportNumber,
+      serviceType: formData.serviceType,
+      appointmentDate: formData.appointmentDate,
+      notes: formData.notes,
+    };
+
+    try {
+      await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      
+      setIsSuccess(true);
+      
+    } catch (err) {
+      console.error(err);
+      alert('حدث خطأ أثناء الإرسال. حاول مرة أخرى.');
+    } finally {
+      setIsSubmitting(false);
     }
-    submitData.append('_subject', `تسجيل عميل جديد - ${formData.fullName}`);
-    submitData.append('_replyto', formData.email);
-    await handleSubmit(submitData);
   };
 
-  if (state.succeeded) {
+  if (isSuccess) {
     return (
       <div className="max-w-2xl mx-auto">
         <div className="bg-emerald-50 border-2 border-emerald-200 rounded-3xl p-8 text-center shadow-lg">
@@ -172,7 +197,7 @@ export default function ClientForm() {
         </div>
       </div>
 
-      <form onSubmit={onSubmit} className="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
+      <form onSubmit={handleSubmit} className="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
         <div className="bg-gradient-to-l from-primary-600 to-primary-700 px-8 py-6">
           <h2 className="text-xl font-bold text-white flex items-center gap-2">
             <User size={24} />
@@ -187,7 +212,7 @@ export default function ClientForm() {
               <User size={20} className="text-primary-600" />
               البيانات الشخصية
             </h3>
-
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label className="block text-sm font-semibold text-slate-700">
@@ -301,7 +326,7 @@ export default function ClientForm() {
               <FileText size={20} className="text-primary-600" />
               بيانات الجواز
             </h3>
-
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label className="block text-sm font-semibold text-slate-700">
@@ -333,7 +358,7 @@ export default function ClientForm() {
                 <label className="block text-sm font-semibold text-slate-700">
                   صورة الجواز <span className="text-slate-400 font-normal">(اختياري - صورة أو PDF)</span>
                 </label>
-
+                
                 {!passportFile ? (
                   <div className="relative">
                     <input
@@ -390,7 +415,7 @@ export default function ClientForm() {
               <Briefcase size={20} className="text-primary-600" />
               الخدمة والموعد
             </h3>
-
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label className="block text-sm font-semibold text-slate-700">
@@ -466,10 +491,10 @@ export default function ClientForm() {
           <div className="pt-4">
             <button
               type="submit"
-              disabled={state.submitting}
+              disabled={isSubmitting}
               className="w-full bg-gradient-to-l from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-bold py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-lg"
             >
-              {state.submitting ? (
+              {isSubmitting ? (
                 <>
                   <Loader2 size={20} className="animate-spin" />
                   جاري الإرسال...
@@ -481,15 +506,6 @@ export default function ClientForm() {
                 </>
               )}
             </button>
-
-            {state.errors && Object.keys(state.errors).length > 0 && (
-              <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl">
-                <p className="text-red-600 text-sm flex items-center gap-2">
-                  <AlertCircle size={16} />
-                  حدث خطأ أثناء الإرسال. يرجى المحاولة مرة أخرى.
-                </p>
-              </div>
-            )}
           </div>
         </div>
       </form>
