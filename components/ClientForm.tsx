@@ -38,8 +38,9 @@ const serviceTypes = [
   { value: 'other', label: 'أخرى' },
 ];
 
-// ✅ اللينك جاهز من Apps Script
-const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxBqZnwlhfEI21TIqgb-TE1oD5yrYeAd-jmGcUXjEVwgTtzu2BUWXXTeppwnwfSJgwW/exec';
+// ✅ Formspree Endpoint
+const FORMSPREE_URL = 'https://formspree.io/f/xwvgbdkd';
+
 export default function ClientForm() {
   const [formData, setFormData] = useState<FormData>({
     fullName: '',
@@ -132,30 +133,37 @@ export default function ClientForm() {
 
     setIsSubmitting(true);
 
-    const data = {
-      fullName: formData.fullName,
-      email: formData.email,
-      phone: formData.phone,
-      nationality: formData.nationality,
-      passportNumber: formData.passportNumber,
-      serviceType: formData.serviceType,
-      appointmentDate: formData.appointmentDate,
-      notes: formData.notes,
-    };
-
     try {
-      await fetch(WEBHOOK_URL, {
+      const response = await fetch(FORMSPREE_URL, {
         method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        headers: { 
+          'Accept': 'application/json',
+          'Content-Type': 'application/json' 
+        },
+        body: JSON.stringify({
+          fullName: formData.fullName,
+          email: formData.email,
+          phone: formData.phone,
+          nationality: formData.nationality,
+          passportNumber: formData.passportNumber,
+          serviceType: formData.serviceType,
+          appointmentDate: formData.appointmentDate,
+          notes: formData.notes,
+          _subject: `تسجيل عميل جديد - ${formData.fullName}`,
+        }),
       });
-      
-      setIsSuccess(true);
+
+      if (response.ok) {
+        setIsSuccess(true);
+      } else {
+        const errorData = await response.json().catch(() => null);
+        console.error('Formspree error:', errorData);
+        alert('حدث خطأ أثناء الإرسال. حاول مرة أخرى.');
+      }
       
     } catch (err) {
       console.error(err);
-      alert('حدث خطأ أثناء الإرسال. حاول مرة أخرى.');
+      alert('حدث خطأ أثناء الإرسال. تأكد من اتصالك بالإنترنت وحاول مرة أخرى.');
     } finally {
       setIsSubmitting(false);
     }
