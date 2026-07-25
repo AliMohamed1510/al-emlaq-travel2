@@ -21,16 +21,16 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 // 🔐 بيانات ثابتة (ممكن تربطها بـ API أو Sheet بعدين)
 const ADMIN_CREDENTIALS = {
-  username: 'admin',
-  password: 'admin123',
+  username: 'AlEmlaQ',
+  password: 'Asd123@#',
   role: 'admin' as UserRole,
   companyName: 'Al EmlaQ Admin',
 };
 
 // 🏢 الشركات (أنت اللي هتضيفهم)
 const COMPANIES = [
-  { username: 'company1', password: 'pass123', role: 'company' as UserRole, companyName: 'شركة السفر الأولى' },
-  { username: 'company2', password: 'pass456', role: 'company' as UserRole, companyName: 'شركة السفر الثانية' },
+  { username: 'kahaled@alemlaq.com', password: 'pass123', role: 'company' as UserRole, companyName: 'شركة الخالد' },
+  { username: 'ALFAGR@alemlaq.com', password: 'Mohsen@12', role: 'company' as UserRole, companyName: 'AL FAGR' },
   { username: 'company3', password: 'pass789', role: 'company' as UserRole, companyName: 'شركة السفر الثالثة' },
 ];
 
