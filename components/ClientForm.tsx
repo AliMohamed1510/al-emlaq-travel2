@@ -29,7 +29,7 @@ interface FormData {
 
 const serviceTypes = [
   { value: '', label: 'اختر نوع الخدمة' },
-  { value: 'visa', label: 'تأشيرة سفر' },
+  { value: 'visa', label: 'موعد تأشيرة (شنغن)' },
   { value: 'hajj', label: 'حج' },
   { value: 'umrah', label: 'عمرة' },
   { value: 'flight', label: 'حجز طيران' },
@@ -133,26 +133,28 @@ export default function ClientForm() {
 
     setIsSubmitting(true);
 
-    const data = {
-      fullName: formData.fullName,
-      email: formData.email,
-      phone: formData.phone,
-      nationality: formData.nationality,
-      passportNumber: formData.passportNumber,
-      serviceType: formData.serviceType,
-      appointmentDate: formData.appointmentDate,
-      notes: formData.notes,
-    };
+    // 🎯 Formspree بيفهم FormData أفضل من JSON
+    const formPayload = new FormData();
+    formPayload.append('fullName', formData.fullName);
+    formPayload.append('email', formData.email);
+    formPayload.append('phone', formData.phone);
+    formPayload.append('nationality', formData.nationality);
+    formPayload.append('passportNumber', formData.passportNumber);
+    formPayload.append('serviceType', formData.serviceType);
+    formPayload.append('appointmentDate', formData.appointmentDate);
+    formPayload.append('notes', formData.notes || '');
 
     try {
-      await fetch(WEBHOOK_URL, {
+      const response = await fetch(WEBHOOK_URL, {
         method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: formPayload,
       });
       
-      setIsSuccess(true);
+      if (response.ok) {
+        setIsSuccess(true);
+      } else {
+        alert('حدث خطأ أثناء الإرسال. حاول مرة أخرى.');
+      }
       
     } catch (err) {
       console.error(err);
