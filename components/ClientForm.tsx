@@ -38,8 +38,9 @@ const serviceTypes = [
   { value: 'other', label: 'أخرى' },
 ];
 
-// ✅ اللينك جاهز من Apps Script
+// ✅ Formspree webhook
 const WEBHOOK_URL = 'https://formspree.io/f/xwvgbdkd';
+
 export default function ClientForm() {
   const [formData, setFormData] = useState<FormData>({
     fullName: '',
