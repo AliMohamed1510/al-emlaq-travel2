@@ -31,7 +31,7 @@ const ADMIN_CREDENTIALS = {
 const COMPANIES = [
   { username: 'kahaled@alemlaq.com', password: 'pass123', role: 'company' as UserRole, companyName: 'شركة الخالد' },
   { username: 'ALFAGR@alemlaq.com', password: 'Mohsen@12', role: 'company' as UserRole, companyName: 'AL FAGR' },
-  { username: 'company3', password: 'pass789', role: 'company' as UserRole, companyName: 'شركة السفر الثالثة' },
+  { username: 'Ranatrip@alemlaq.com', password: 'Ranatrip123', role: 'company' as UserRole, companyName: 'شركة Rana trip' },
 ];
 
 export function AuthProvider({ children }: { children: ReactNode }) {
