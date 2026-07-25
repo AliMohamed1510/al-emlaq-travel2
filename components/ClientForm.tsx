@@ -39,8 +39,7 @@ const serviceTypes = [
 ];
 
 // ✅ اللينك جاهز من Apps Script
-const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbzbFjfm1VF8tYgRl6Gsc22B-S2F3Y9fx3P8lNznBk2xG5WWO1olsuaTJAX1DSrxqdvp/exec';
-
+const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxBqZnwlhfEI21TIqgb-TE1oD5yrYeAd-jmGcUXjEVwgTtzu2BUWXXTeppwnwfSJgwW/exec';
 export default function ClientForm() {
   const [formData, setFormData] = useState<FormData>({
     fullName: '',
